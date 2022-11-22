@@ -7,9 +7,11 @@ package jumpert.autoethernet;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
@@ -21,11 +23,11 @@ public class AutoEthernet extends javax.swing.JFrame {
     private Timer tiempo;
     private int milis=0, seg=0, min=0;
     
-    private ActionListener acciones = new ActionListener() {
+    public ActionListener acciones = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e){
-            milis++;
-            if (milis == 100) {
+            milis = milis + 2;
+            if (milis == 1000) {
                 seg++;
                 milis= 0;
             }
@@ -38,15 +40,45 @@ public class AutoEthernet extends javax.swing.JFrame {
                 dispose();
             }
             actualizarTiempo();
+            
+            // cargar tabla
+            Random r = new Random();
+            
+            //int ri = r.nextInt(600) + 1;
+            int item = r.nextInt(7) + 1;
+            
+                delay(800);
+                String[] items = {"Luces", "Frenos","Radar Del.", "Radar Tras.", "Presion Aire", "Tren de poder", "Cam Del.", "Cam Tras."};
+
+                String[] infoData = new String[8];
+                infoData[0] = etiqueta_tiempo;
+                infoData[1] = "AuE";
+                
+                    infoData[2] = items[item];
+                
+                infoData[3] = "PHY";
+                infoData[4] = "Message";
+                infoData[5] = "Tx";
+                infoData[6] = "8";
+                infoData[7] = Integer.toHexString(ranNum()) + " 00 00 00 00 00 00";
+                model.addRow(infoData);
+                Tabla.setModel(model);
         }
     };
-    private String etiqueta_tiempo;
-    private String timeSec;
-    private void actualizarTiempo(){
+    private void delay(long milis)
+	{
+		try {
+			Thread.sleep(milis);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+    
+    public String etiqueta_tiempo;
+    public String timeSec;
+    public void actualizarTiempo(){
         String texto = (min<=9?"0":"")+min+":"+(seg<=9?"0":"")+seg+":"+(milis<=9?"0":"")+milis;
-        String intStr = (min<=9?"0":"")+min+(seg<=9?"0":"")+seg+(milis<=9?"0":"")+milis;
         etiqueta_tiempo= texto;
-        timeSec = intStr;
     }
     DefaultTableModel model = new DefaultTableModel();
     
@@ -63,14 +95,53 @@ public class AutoEthernet extends javax.swing.JFrame {
         
     }
     
-    private void setModelo() {
-        String[] header = {"Timestrap", "C", "ID", "Name", "Dir", "D", "Data"};
-        model.setColumnIdentifiers(header);
+    public void cargarTabla(){
+        String[] items = {"Luces", "Frenos","Radar Del.", "Radar Tras.", "Presion Aire", "Tren de poder", "Cam Del.", "Cam Tras."};
+        actualizarTiempo();
+        String[] infoData = new String[8];
+        infoData[0] = etiqueta_tiempo;
+        infoData[1] = "AuE";
+        for (String item : items){
+            infoData[2] = item;
+        }
+        infoData[3] = "PHY";
+        infoData[4] = "Message";
+        infoData[5] = "Tx";
+        infoData[6] = "8";
+        infoData[7] = Integer.toHexString(ranNum()) + " 00 00 00 00 00 00";
+        model.addRow(infoData);
         Tabla.setModel(model);
     }
     
-    private void setDato() {
-        
+    public void setModelo() {
+        String[] header = {"Timestrap", "C", "ID","Destination", "Name", "Dir", "D", "Data"};
+        model.setColumnIdentifiers(header);
+        Tabla.setModel(model);
+        Tabla.getColumnModel().getColumn(0).setPreferredWidth(30);
+        Tabla.getColumnModel().getColumn(1).setPreferredWidth(15);
+        Tabla.getColumnModel().getColumn(2).setPreferredWidth(40);
+        Tabla.getColumnModel().getColumn(3).setPreferredWidth(40);
+        Tabla.getColumnModel().getColumn(4).setPreferredWidth(40);
+        Tabla.getColumnModel().getColumn(5).setPreferredWidth(15);
+        Tabla.getColumnModel().getColumn(6).setPreferredWidth(15);
+        Tabla.getColumnModel().getColumn(7).setPreferredWidth(120);
+
+    }
+    public int ranNum () {
+        Random r = new Random();
+        int randomInt = r.nextInt(255) + 1;
+        return randomInt;
+    }
+    
+    public String randomData() {
+  
+        StringBuilder text = new StringBuilder();
+        text.append(Integer.toHexString(ranNum()));
+        for (int i = 0; i <7; i++) {
+            int num = ranNum();
+            text.append(" " + (num<=15?"0":"")+Integer.toHexString(num));
+        }
+        return text.toString();
     }
 
     /**
@@ -86,7 +157,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        Tabla = new javax.swing.JTable();
+        Tabla = new ColorCelda();
         jPanel4 = new javax.swing.JPanel();
         LUCES = new javax.swing.JButton();
         FRENOS = new javax.swing.JButton();
@@ -128,10 +199,7 @@ public class AutoEthernet extends javax.swing.JFrame {
 
         Tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {},
-                {},
-                {},
-                {}
+
             },
             new String [] {
 
@@ -144,13 +212,16 @@ public class AutoEthernet extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(258, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 820, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(364, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 696, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
         );
 
         jPanel4.setLayout(null);
@@ -236,7 +307,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         jPanel4.add(CAMD);
         CAMD.setBounds(35, 300, 90, 22);
         jPanel4.add(jLabel2);
-        jLabel2.setBounds(30, 0, 1030, 370);
+        jLabel2.setBounds(20, 0, 1040, 370);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -245,7 +316,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1110, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1092, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -277,15 +348,15 @@ public class AutoEthernet extends javax.swing.JFrame {
 
     private void FRENOSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FRENOSActionPerformed
         // TODO add your handling code here:
-        String[] infoFrenos = new String[7];
+        String[] infoFrenos = new String[8];
         infoFrenos[0] = etiqueta_tiempo;
         infoFrenos[1] = "AuE";
         infoFrenos[2] = "Frenos";
-        infoFrenos[3] = "Alert";
-        infoFrenos[4] = "Tx";
-        infoFrenos[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoFrenos[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoFrenos[3] = "Tren de poder";
+        infoFrenos[4] = "Alert";
+        infoFrenos[5] = "Tx";
+        infoFrenos[6] = "8";
+        infoFrenos[7] = randomData();
         model.addRow(infoFrenos);
         Tabla.setModel(model);
     }//GEN-LAST:event_FRENOSActionPerformed
@@ -293,105 +364,105 @@ public class AutoEthernet extends javax.swing.JFrame {
     
     private void LUCESActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LUCESActionPerformed
         // TODO add your handling code here:
-        String[] infoLuces = new String[7];
+        String[] infoLuces = new String[8];
         infoLuces[0] = etiqueta_tiempo;
         infoLuces[1] = "AuE";
         infoLuces[2] = "Luces";
-        infoLuces[3] = "Alert";
-        infoLuces[4] = "Tx";
-        infoLuces[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoLuces[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoLuces[3] = "PHY";
+        infoLuces[4] = "Message";
+        infoLuces[5] = "Tx";
+        infoLuces[6] = "8";
+        infoLuces[7] = Integer.toHexString(ranNum()) + " 00 00 00 00 00 00";
         model.addRow(infoLuces);
         Tabla.setModel(model);
     }//GEN-LAST:event_LUCESActionPerformed
 
     private void AIREActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AIREActionPerformed
         // TODO add your handling code here:
-        String[] infoLuces = new String[7];
+        String[] infoLuces = new String[8];
         infoLuces[0] = etiqueta_tiempo;
         infoLuces[1] = "AuE";
-        infoLuces[2] = "Luces";
-        infoLuces[3] = "Alert";
-        infoLuces[4] = "Tx";
-        infoLuces[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoLuces[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoLuces[2] = "Presion Aire";
+        infoLuces[3] = "Tren de poder";
+        infoLuces[4] = "Alert";
+        infoLuces[5] = "Tx";
+        infoLuces[6] = "8";
+        infoLuces[7] = randomData();
         model.addRow(infoLuces);
         Tabla.setModel(model);
     }//GEN-LAST:event_AIREActionPerformed
 
     private void TRENActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TRENActionPerformed
         // TODO add your handling code here:
-        String[] infoLuces = new String[7];
+        String[] infoLuces = new String[8];
         infoLuces[0] = etiqueta_tiempo;
         infoLuces[1] = "AuE";
-        infoLuces[2] = "Luces";
-        infoLuces[3] = "Alert";
-        infoLuces[4] = "Tx";
-        infoLuces[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoLuces[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoLuces[2] = "Trem de poder";
+        infoLuces[3] = "Frenos";
+        infoLuces[4] = "Alert";
+        infoLuces[5] = "Tx";
+        infoLuces[6] = "8";
+        infoLuces[7] = randomData();
         model.addRow(infoLuces);
         Tabla.setModel(model);
     }//GEN-LAST:event_TRENActionPerformed
 
     private void RADARDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RADARDActionPerformed
         // TODO add your handling code here:
-        String[] infoRadarD = new String[7];
+        String[] infoRadarD = new String[8];
         infoRadarD[0] = etiqueta_tiempo;
         infoRadarD[1] = "AuE";
         infoRadarD[2] = "Radar Del.";
-        infoRadarD[3] = "Alert";
-        infoRadarD[4] = "Tx";
-        infoRadarD[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoRadarD[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoRadarD[3] = "Cam Del.";
+        infoRadarD[4] = "Alert";
+        infoRadarD[5] = "Tx";
+        infoRadarD[6] = "8";
+        infoRadarD[7] = randomData();
         model.addRow(infoRadarD);
         Tabla.setModel(model);
     }//GEN-LAST:event_RADARDActionPerformed
 
     private void RADARTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RADARTActionPerformed
         // TODO add your handling code here:
-        String[] infoRadarT = new String[7];
+        String[] infoRadarT = new String[8];
         infoRadarT[0] = etiqueta_tiempo;
         infoRadarT[1] = "AuE";
         infoRadarT[2] = "Radar Tras.";
-        infoRadarT[3] = "Alert";
-        infoRadarT[4] = "Tx";
-        infoRadarT[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoRadarT[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoRadarT[3] = "Cam Tras.";
+        infoRadarT[4] = "Alert";
+        infoRadarT[5] = "Tx";
+        infoRadarT[6] = "8";
+        infoRadarT[7] = randomData();
         model.addRow(infoRadarT);
         Tabla.setModel(model);
     }//GEN-LAST:event_RADARTActionPerformed
 
     private void CAMDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CAMDActionPerformed
         // TODO add your handling code here:
-        String[] infoCAMD = new String[7];
+        String[] infoCAMD = new String[8];
         infoCAMD[0] = etiqueta_tiempo;
         infoCAMD[1] = "AuE";
         infoCAMD[2] = "Cam. Del.";
-        infoCAMD[3] = "Alert";
-        infoCAMD[4] = "Tx";
-        infoCAMD[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoCAMD[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoCAMD[3] = "InfoEnter.";
+        infoCAMD[4] = "Alert";
+        infoCAMD[5] = "Tx";
+        infoCAMD[6] = "8";
+        infoCAMD[7] = randomData();
         model.addRow(infoCAMD);
         Tabla.setModel(model);
     }//GEN-LAST:event_CAMDActionPerformed
 
     private void CAMTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CAMTActionPerformed
         // TODO add your handling code here:
-        String[] infoCAMT = new String[7];
+        String[] infoCAMT = new String[8];
         infoCAMT[0] = etiqueta_tiempo;
         infoCAMT[1] = "AuE";
         infoCAMT[2] = "Cam. Tras.";
-        infoCAMT[3] = "Alert";
-        infoCAMT[4] = "Tx";
-        infoCAMT[5] = "8";
-        int num = Integer.parseInt(timeSec);
-        infoCAMT[6] = Integer.toHexString(num) + " 00 00 00 00 00 00";
+        infoCAMT[3] = "InfoEnter.";
+        infoCAMT[4] = "Alert";
+        infoCAMT[5] = "Tx";
+        infoCAMT[6] = "8";
+        infoCAMT[7] = randomData();
         model.addRow(infoCAMT);
         Tabla.setModel(model);
     }//GEN-LAST:event_CAMTActionPerformed
@@ -426,7 +497,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             
@@ -434,9 +505,11 @@ public class AutoEthernet extends javax.swing.JFrame {
                 new AutoEthernet().setVisible(true);
                 
             }
+            
         });
+        
     }
-    private void SetImageLabel(JLabel labelName, String root){
+    public void SetImageLabel(JLabel labelName, String root){
         ImageIcon image = new ImageIcon(root);
         Icon icon = new ImageIcon(image.getImage().getScaledInstance(labelName.getWidth(), labelName.getHeight(), Image.SCALE_DEFAULT));
         labelName.setIcon(icon);
