@@ -13,7 +13,9 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import static javax.swing.SwingConstants.CENTER;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -57,7 +59,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             //int ri = r.nextInt(600) + 1;
             int item = r.nextInt(7) + 1;
 
-            delay(800);
+            delay(1500);
             String[] items = {"Luces", "Frenos", "Radar Del.", "Radar Tras.", "Presion Aire", "Tren de poder", "Cam Del.", "Cam Tras."};
 
             String[] infoData = new String[8];
@@ -93,6 +95,7 @@ public class AutoEthernet extends javax.swing.JFrame {
     }
     DefaultTableModel model = new DefaultTableModel();
 
+    ColorCelda colorCelda = new ColorCelda();
     /**
      * Creates new form AutoMEthernet
      */
@@ -104,34 +107,38 @@ public class AutoEthernet extends javax.swing.JFrame {
         tiempo = new Timer(10, acciones);
         tiempo.start();
         setModelo();
+        ((DefaultTableCellRenderer)Tabla.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(CENTER);
+        ((JLabel)Tabla.getTableHeader().getDefaultRenderer()).setBackground(new Color(142,217,225));
+        Tabla.setDefaultRenderer(Tabla.getColumnClass(4), colorCelda);
 
     }
 
     public void panelAlerta() {
+        Color tenue = new Color(142, 217, 225);
         SetImageLabel(luces, "src/main/java/images/luces.png");
         luces.setOpaque(true);
-        luces.setBackground(Color.lightGray);
+        luces.setBackground(tenue);
         SetImageLabel(frenos, "src/main/java/images/frenos.png");
         frenos.setOpaque(true);
-        frenos.setBackground(Color.lightGray);
+        frenos.setBackground(tenue);
         SetImageLabel(tren, "src/main/java/images/tren.png");
         tren.setOpaque(true);
-        tren.setBackground(Color.lightGray);
+        tren.setBackground(tenue);
         SetImageLabel(aire, "src/main/java/images/aire.png");
         aire.setOpaque(true);
-        aire.setBackground(Color.lightGray);
+        aire.setBackground(tenue);
         SetImageLabel(radar, "src/main/java/images/radar.png");
         radar.setOpaque(true);
-        radar.setBackground(Color.lightGray);
+        radar.setBackground(tenue);
         SetImageLabel(radarT, "src/main/java/images/radarT.png");
         radarT.setOpaque(true);
-        radarT.setBackground(Color.lightGray);
+        radarT.setBackground(tenue);
         SetImageLabel(camD, "src/main/java/images/camD.png");
         camD.setOpaque(true);
-        camD.setBackground(Color.lightGray);
+        camD.setBackground(tenue);
         SetImageLabel(camT, "src/main/java/images/camT.png");
         camT.setOpaque(true);
-        camT.setBackground(Color.lightGray);
+        camT.setBackground(tenue);
         luzAlerta = 0;
         frenosAlerta = 0;
         trenAlerta = 0;
@@ -155,7 +162,12 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoData[4] = "Message";
         infoData[5] = "Tx";
         infoData[6] = "8";
-        infoData[7] = Integer.toHexString(ranNum()) + " 00 00 00 00 00 00";
+        int num = ranNum();
+        StringBuilder numStr = new StringBuilder("");
+        if (num <=15){
+            numStr.append("0");
+        } 
+        infoData[7] = numStr.toString() + Integer.toHexString(num) + " 00 00 00 00 00 00";
         model.addRow(infoData);
         Tabla.setModel(model);
     }
@@ -187,7 +199,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         text.append(Integer.toHexString(ranNum()));
         for (int i = 0; i < 7; i++) {
             int num = ranNum();
-            text.append(" " + (num <= 15 ? "0" : "") + Integer.toHexString(num));
+            text.append((" " + (num <= 15 ? "0" : "") + Integer.toHexString(num)).toString());
         }
         return text.toString();
     }
@@ -206,7 +218,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         luces = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        Tabla = new ColorCelda();
+        Tabla = new javax.swing.JTable();
         frenos = new javax.swing.JLabel();
         tren = new javax.swing.JLabel();
         aire = new javax.swing.JLabel();
@@ -254,6 +266,7 @@ public class AutoEthernet extends javax.swing.JFrame {
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        luces.setForeground(new java.awt.Color(240, 240, 240));
         luces.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel3.add(luces, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 70, 40));
 
@@ -265,6 +278,8 @@ public class AutoEthernet extends javax.swing.JFrame {
 
             }
         ));
+        Tabla.setSelectionForeground(new java.awt.Color(10, 100, 10));
+        Tabla.setShowVerticalLines(true);
         jScrollPane1.setViewportView(Tabla);
 
         jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(364, 6, 696, 202));
@@ -419,7 +434,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             frenosAlerta = 1;
         } else {
             if (frenosAlerta == 1) {
-                frenos.setBackground(Color.lightGray);
+                frenos.setBackground(new Color(142, 217, 225));
                 frenosAlerta = 0;
             }
         }
@@ -430,7 +445,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoFrenos[3] = "Tren de poder";
         infoFrenos[4] = "Alert";
         infoFrenos[5] = "Tx";
-        infoFrenos[6] = "8";
+        infoFrenos[6] = "15";
         infoFrenos[7] = randomData();
         model.addRow(infoFrenos);
         Tabla.setModel(model);
@@ -444,7 +459,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             luzAlerta = 1;
         } else {
             if (luzAlerta == 1) {
-                luces.setBackground(Color.lightGray);
+                luces.setBackground(new Color(142, 217, 225));
                 luzAlerta = 0;
             }
         }
@@ -454,9 +469,9 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoLuces[1] = "AuE";
         infoLuces[2] = "Luces";
         infoLuces[3] = "PHY";
-        infoLuces[4] = "Message";
+        infoLuces[4] = "Alert";
         infoLuces[5] = "Tx";
-        infoLuces[6] = "8";
+        infoLuces[6] = "10";
         infoLuces[7] = Integer.toHexString(ranNum()) + " 00 00 00 00 00 00";
         model.addRow(infoLuces);
         Tabla.setModel(model);
@@ -468,20 +483,20 @@ public class AutoEthernet extends javax.swing.JFrame {
             aireAlerta = 1;
         } else {
             if (aireAlerta == 1) {
-                aire.setBackground(Color.lightGray);
+                aire.setBackground(new Color(142, 217, 225));
                 aireAlerta = 0;
             }
         }
-        String[] infoLuces = new String[8];
-        infoLuces[0] = etiqueta_tiempo;
-        infoLuces[1] = "AuE";
-        infoLuces[2] = "Presion Aire";
-        infoLuces[3] = "Tren de poder";
-        infoLuces[4] = "Alert";
-        infoLuces[5] = "Tx";
-        infoLuces[6] = "8";
-        infoLuces[7] = randomData();
-        model.addRow(infoLuces);
+        String[] infoAire = new String[8];
+        infoAire[0] = etiqueta_tiempo;
+        infoAire[1] = "AuE";
+        infoAire[2] = "Presion Aire";
+        infoAire[3] = "Tren de poder";
+        infoAire[4] = "Alert";
+        infoAire[5] = "Tx";
+        infoAire[6] = "8";
+        infoAire[7] = randomData();
+        model.addRow(infoAire);
         Tabla.setModel(model);
     }//GEN-LAST:event_AIREActionPerformed
 
@@ -491,20 +506,20 @@ public class AutoEthernet extends javax.swing.JFrame {
             trenAlerta = 1;
         } else {
             if (trenAlerta == 1) {
-                tren.setBackground(Color.lightGray);
+                tren.setBackground(new Color(142, 217, 225));
                 trenAlerta = 0;
             }
         }
-        String[] infoLuces = new String[8];
-        infoLuces[0] = etiqueta_tiempo;
-        infoLuces[1] = "AuE";
-        infoLuces[2] = "Trem de poder";
-        infoLuces[3] = "Frenos";
-        infoLuces[4] = "Alert";
-        infoLuces[5] = "Tx";
-        infoLuces[6] = "8";
-        infoLuces[7] = randomData();
-        model.addRow(infoLuces);
+        String[] infoTren = new String[8];
+        infoTren[0] = etiqueta_tiempo;
+        infoTren[1] = "AuE";
+        infoTren[2] = "Trem de poder";
+        infoTren[3] = "Frenos";
+        infoTren[4] = "Alert";
+        infoTren[5] = "Tx";
+        infoTren[6] = "24";
+        infoTren[7] = randomData();
+        model.addRow(infoTren);
         Tabla.setModel(model);
     }//GEN-LAST:event_TRENActionPerformed
 
@@ -514,7 +529,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             radarAlerta = 1;
         } else {
             if (radarAlerta == 1) {
-                radar.setBackground(Color.lightGray);
+                radar.setBackground(new Color(142, 217, 225));
                 radarAlerta = 0;
             }
         }
@@ -525,7 +540,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoRadarD[3] = "Cam Del.";
         infoRadarD[4] = "Alert";
         infoRadarD[5] = "Tx";
-        infoRadarD[6] = "8";
+        infoRadarD[6] = "14";
         infoRadarD[7] = randomData();
         model.addRow(infoRadarD);
         Tabla.setModel(model);
@@ -537,7 +552,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             radarAlertaT = 1;
         } else {
             if (radarAlertaT == 1) {
-                radarT.setBackground(Color.lightGray);
+                radarT.setBackground(new Color(142, 217, 225));
                 radarAlertaT = 0;
             }
         }
@@ -548,7 +563,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoRadarT[3] = "Cam Tras.";
         infoRadarT[4] = "Alert";
         infoRadarT[5] = "Tx";
-        infoRadarT[6] = "8";
+        infoRadarT[6] = "16";
         infoRadarT[7] = randomData();
         model.addRow(infoRadarT);
         Tabla.setModel(model);
@@ -560,7 +575,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             camDAlerta = 1;
         } else {
             if (camDAlerta == 1) {
-                camD.setBackground(Color.lightGray);
+                camD.setBackground(new Color(142, 217, 225));
                 camDAlerta = 0;
             }
         }
@@ -571,7 +586,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoCAMD[3] = "InfoEnter.";
         infoCAMD[4] = "Alert";
         infoCAMD[5] = "Tx";
-        infoCAMD[6] = "8";
+        infoCAMD[6] = "18";
         infoCAMD[7] = randomData();
         model.addRow(infoCAMD);
         Tabla.setModel(model);
@@ -583,7 +598,7 @@ public class AutoEthernet extends javax.swing.JFrame {
             camTAlerta = 1;
         } else {
             if (camTAlerta == 1) {
-                camT.setBackground(Color.lightGray);
+                camT.setBackground(new Color(142, 217, 225));
                 camTAlerta = 0;
             }
         }
@@ -594,7 +609,7 @@ public class AutoEthernet extends javax.swing.JFrame {
         infoCAMT[3] = "InfoEnter.";
         infoCAMT[4] = "Alert";
         infoCAMT[5] = "Tx";
-        infoCAMT[6] = "8";
+        infoCAMT[6] = "16";
         infoCAMT[7] = randomData();
         model.addRow(infoCAMT);
         Tabla.setModel(model);
